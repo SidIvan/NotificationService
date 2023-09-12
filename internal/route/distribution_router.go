@@ -126,8 +126,8 @@ func (s *RouteDistributionService) singleInfoDistributionHandler(w http.Response
 
 func (s *RouteDistributionService) modifyDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
+	w.WriteHeader(http.StatusOK)
 	if !s.DistributionRepo.IsDistributionExist(id) {
-		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("distribution does not exist"))
 		return
 	}
@@ -135,7 +135,7 @@ func (s *RouteDistributionService) modifyDistributionHandler(w http.ResponseWrit
 	if !parseBody(w, r, &distribution) {
 		return
 	}
-	repo.DistributionRepo.UpdateDistribution(id, &distribution)
+	s.DistributionRepo.UpdateDistribution(id, &distribution)
 }
 
 func (s *RouteDistributionService) deleteDistributionHandler(w http.ResponseWriter, r *http.Request) {

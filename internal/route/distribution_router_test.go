@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
 )
 
 func TestSuccessCreateDistributionHandler(t *testing.T) {
@@ -108,6 +109,7 @@ func TestFailedCreateDistributionWrongFormat(t *testing.T) {
 	opCode := "invalidOpCode"
 	tag := "Dr. Livesey"
 	endAt := "3000-09-01T15:00:00+03:00"
+
 	w := utils.NewMockResponseWriter(ctrl)
 	w.EXPECT().WriteHeader(http.StatusOK)
 	w.EXPECT().Write([]byte(ErrInvalidDistributionFormat.Error()))
@@ -132,4 +134,55 @@ func TestFailedCreateDistributionWrongFormat(t *testing.T) {
 	distributionService := &RouteDistributionService{distributionRepo, nil}
 
 	distributionService.createDistributionHandler(w, r)
+}
+
+var (
+	distrId                     = "DISTR_ID"
+	startAt                     = "1980-09-01T15:00:00+03:00"
+	message                     = "test message"
+	opCode                      = "967"
+	tag                         = "Dr. Livesey"
+	endAt                       = "3000-09-01T15:00:00+03:00"
+	expectedSuccessDistribution = dto.Distribution{
+		StartAt: startAt,
+		Message: message,
+		Filter: dto.Filter{
+			OpCode: opCode,
+			Tag:    tag,
+		},
+		EndAt: endAt,
+	}
+)
+
+func TestSuccessModifyDistribution(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+
+	distributionRepo := repo.NewMockDistributionRepoInterface(ctrl)
+	distributionRepo.EXPECT().IsDistributionExist(distrId).Return(true)
+	distributionRepo.EXPECT().UpdateDistribution(distrId, &expectedSuccessDistribution)
+
+	r, err := http.NewRequest(http.MethodPost, "", strings.NewReader(fmt.Sprintf(
+		`{
+			"StartAt":"%s",
+			"Message":"%s",
+			"Filter":{
+				"OpCode":"%s",
+				"Tag":"%s"
+			},
+			"EndAt":"%s"
+		}`, startAt, message, opCode, tag, endAt,
+	)))
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	vars := make(map[string]string)
+	vars["id"] = distrId
+	r = mux.SetURLVars(r, vars)
+
+	distributionService := &RouteDistributionService{distributionRepo, nil}
+
+	distributionService.modifyDistributionHandler(w, r)
 }
