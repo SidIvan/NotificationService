@@ -186,3 +186,36 @@ func TestSuccessModifyDistribution(t *testing.T) {
 
 	distributionService.modifyDistributionHandler(w, r)
 }
+
+func TestFailedModifyDistributionNonExistingId(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+	w.EXPECT().Write([]byte(ErrNonExistenseDistribution.Error()))
+
+	distributionRepo := repo.NewMockDistributionRepoInterface(ctrl)
+	distributionRepo.EXPECT().IsDistributionExist(distrId).Return(false)
+
+	r, err := http.NewRequest(http.MethodPost, "", strings.NewReader(fmt.Sprintf(
+		`{
+			"StartAt":"%s",
+			"Message":"%s",
+			"Filter":{
+				"OpCode":"%s",
+				"Tag":"%s"
+			},
+			"EndAt":"%s"
+		}`, startAt, message, opCode, tag, endAt,
+	)))
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	vars := make(map[string]string)
+	vars["id"] = distrId
+	r = mux.SetURLVars(r, vars)
+
+	distributionService := &RouteDistributionService{distributionRepo, nil}
+
+	distributionService.modifyDistributionHandler(w, r)
+}

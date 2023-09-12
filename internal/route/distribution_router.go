@@ -19,6 +19,7 @@ var (
 
 var (
 	ErrInvalidDistributionFormat = errors.New("invalid disctribution info format")
+	ErrNonExistenseDistribution  = errors.New("distribution does not exist")
 )
 
 func NewDistributionRouter(r *mux.Router) {
@@ -128,7 +129,7 @@ func (s *RouteDistributionService) modifyDistributionHandler(w http.ResponseWrit
 	id := mux.Vars(r)["id"]
 	w.WriteHeader(http.StatusOK)
 	if !s.DistributionRepo.IsDistributionExist(id) {
-		w.Write([]byte("distribution does not exist"))
+		w.Write([]byte(ErrNonExistenseDistribution.Error()))
 		return
 	}
 	var distribution dto.Distribution
