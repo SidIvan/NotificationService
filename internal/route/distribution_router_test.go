@@ -102,7 +102,7 @@ func TestSuccesCreateDistributionHandlerRunSendDistribution(t *testing.T) {
 	wg.Wait()
 }
 
-func TestFailedCreateDistributionWrongFormat(t *testing.T) {
+func TestFailedCreateDistributionHandlerWrongFormat(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	startAt := "1980-09-01T15:00:00+03:00"
 	message := "test message"
@@ -154,7 +154,7 @@ var (
 	}
 )
 
-func TestSuccessModifyDistribution(t *testing.T) {
+func TestSuccessModifyDistributionHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	w := utils.NewMockResponseWriter(ctrl)
@@ -164,7 +164,7 @@ func TestSuccessModifyDistribution(t *testing.T) {
 	distributionRepo.EXPECT().IsDistributionExist(distrId).Return(true)
 	distributionRepo.EXPECT().UpdateDistribution(distrId, &expectedSuccessDistribution)
 
-	r, err := http.NewRequest(http.MethodPost, "", strings.NewReader(fmt.Sprintf(
+	r, err := http.NewRequest(http.MethodPut, "", strings.NewReader(fmt.Sprintf(
 		`{
 			"StartAt":"%s",
 			"Message":"%s",
@@ -187,7 +187,7 @@ func TestSuccessModifyDistribution(t *testing.T) {
 	distributionService.modifyDistributionHandler(w, r)
 }
 
-func TestFailedModifyDistributionNonExistingId(t *testing.T) {
+func TestFailedModifyDistributionHandlerNonExistingId(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	w := utils.NewMockResponseWriter(ctrl)
@@ -218,4 +218,44 @@ func TestFailedModifyDistributionNonExistingId(t *testing.T) {
 	distributionService := &RouteDistributionService{distributionRepo, nil}
 
 	distributionService.modifyDistributionHandler(w, r)
+}
+
+func TestDeleteDistributionHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+
+	distributionRepo := repo.NewMockDistributionRepoInterface(ctrl)
+	distributionRepo.EXPECT().DeleteDistribution(distrId)
+
+	r, err := http.NewRequest(http.MethodPost, "", nil)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	vars := make(map[string]string)
+	vars["id"] = distrId
+	r = mux.SetURLVars(r, vars)
+
+	distributionService := &RouteDistributionService{distributionRepo, nil}
+
+	distributionService.deleteDistributionHandler(w, r)
+}
+
+func TestHandleDistributionHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+
+	messageSender := NewMockMessageSenderInterface(ctrl)
+	messageSender.EXPECT().HandleDistributions()
+
+	distributionService := &RouteDistributionService{nil, messageSender}
+	r, err := http.NewRequest(http.MethodPatch, "", nil)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	distributionService.handleDistributionHandler(w, r)
 }
