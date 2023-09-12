@@ -5,6 +5,7 @@ import (
 	"NotificationService/internal/repo"
 	"NotificationService/internal/utils"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -14,6 +15,10 @@ import (
 var (
 	authToken           string
 	DistributionService RouteDistributionService
+)
+
+var (
+	ErrInvalidDistributionFormat = errors.New("invalid disctribution info format")
 )
 
 func NewDistributionRouter(r *mux.Router) {
@@ -55,7 +60,7 @@ func (s *RouteDistributionService) createDistributionHandler(w http.ResponseWrit
 	}
 	w.WriteHeader(http.StatusOK)
 	if !distribution.IsValid() {
-		w.Write([]byte("Invalid disctribution info format"))
+		w.Write([]byte(ErrInvalidDistributionFormat.Error()))
 		return
 	}
 	id := s.DistributionRepo.CreateDistribution(&distribution)
