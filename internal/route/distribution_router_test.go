@@ -4,6 +4,7 @@ import (
 	"NotificationService/internal/dto"
 	"NotificationService/internal/repo"
 	"NotificationService/internal/utils"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -258,4 +259,94 @@ func TestHandleDistributionHandler(t *testing.T) {
 	}
 
 	distributionService.handleDistributionHandler(w, r)
+}
+
+func TestSuccessSingleInfoDistributionHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+	expectedResponseBody, _ := json.Marshal(expectedSuccessDistribution.WithId(distrId))
+	w.EXPECT().Write(expectedResponseBody).Return(len(expectedResponseBody), nil)
+	w.EXPECT().Header().Return(make(http.Header))
+
+	distributionRepo := repo.NewMockDistributionRepoInterface(ctrl)
+	distributionRepo.EXPECT().FindDistributionById(distrId).Return(expectedSuccessDistribution.WithId(distrId))
+
+	r, err := http.NewRequest(http.MethodGet, "", nil)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	vars := make(map[string]string)
+	vars["id"] = distrId
+	r = mux.SetURLVars(r, vars)
+
+	distributionService := &RouteDistributionService{distributionRepo, nil}
+
+	distributionService.singleInfoDistributionHandler(w, r)
+}
+
+func TestSuccessSingleInfoDistributionHandlerNotExistenceDistribution(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+
+	distributionRepo := repo.NewMockDistributionRepoInterface(ctrl)
+	distributionRepo.EXPECT().FindDistributionById(distrId).Return(nil)
+	w.EXPECT().Write([]byte(ErrNonExistenseDistribution.Error()))
+
+	r, err := http.NewRequest(http.MethodGet, "", nil)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	vars := make(map[string]string)
+	vars["id"] = distrId
+	r = mux.SetURLVars(r, vars)
+
+	distributionService := &RouteDistributionService{distributionRepo, nil}
+
+	distributionService.singleInfoDistributionHandler(w, r)
+}
+
+func TestFullInfoDistributionHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	id1, id2 := "507f1f77bcf86cd799439011", "507f191e810c19729de860ea"
+	startAt2 := "1981-09-01T15:00:00+03:00"
+	message2 := "test message2"
+	opCode2 := "903"
+	tag2 := "Cpt. Smollet"
+	endAt2 := "3001-09-01T15:00:00+03:00"
+	expectedDistribution2 := dto.Distribution{
+		StartAt: startAt2,
+		Message: message2,
+		Filter: dto.Filter{
+			OpCode: opCode2,
+			Tag:    tag2,
+		},
+		EndAt: endAt2,
+	}
+	expectedResponse := []dto.DistributionWithId{
+		*expectedSuccessDistribution.WithId(id1),
+		*expectedDistribution2.WithId(id2),
+	}
+	expectedResponseBody, _ := json.Marshal(expectedResponse)
+
+	w := utils.NewMockResponseWriter(ctrl)
+	w.EXPECT().WriteHeader(http.StatusOK)
+	w.EXPECT().Write([]byte(expectedResponseBody)).Return(len(expectedResponseBody), nil)
+	w.EXPECT().Header().Return(make(http.Header))
+
+	distributionRepo := repo.NewMockDistributionRepoInterface(ctrl)
+	distributionRepo.EXPECT().FindAllDistributions().Return(&expectedResponse)
+
+	r, err := http.NewRequest(http.MethodGet, "", nil)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	distributionService := &RouteDistributionService{distributionRepo, nil}
+
+	distributionService.fullInfoDistributionHandler(w, r)
 }

@@ -95,6 +95,7 @@ func (s *RouteDistributionService) fullInfoDistributionHandler(w http.ResponseWr
 		log.Println("not full response sended")
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *RouteDistributionService) singleInfoDistributionHandler(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +103,7 @@ func (s *RouteDistributionService) singleInfoDistributionHandler(w http.Response
 	distribution := s.DistributionRepo.FindDistributionById(id)
 	if distribution == nil {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Document not found"))
+		w.Write([]byte(ErrNonExistenseDistribution.Error()))
 		return
 	}
 	body, err := json.Marshal(*distribution)
@@ -123,6 +124,7 @@ func (s *RouteDistributionService) singleInfoDistributionHandler(w http.Response
 		log.Println("not full response sended")
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *RouteDistributionService) modifyDistributionHandler(w http.ResponseWriter, r *http.Request) {
