@@ -14,6 +14,7 @@ var (
 	MongoClient      *mongo.Client
 	ClientRepo       *ClientRepoImpl
 	DistributionRepo *DistributionRepoImpl
+	MessageRepo      *MessageRepoImpl
 )
 
 const (
@@ -27,7 +28,7 @@ func fillCollectionVariables(client *mongo.Client, dbName string) {
 	Db = client.Database(dbName)
 	DistributionRepo = &DistributionRepoImpl{Db.Collection(distributionCollectionName)}
 	ClientRepo = &ClientRepoImpl{Db.Collection(clientCollectionName)}
-	messageCollection = Db.Collection(messageCollectionName)
+	MessageRepo = &MessageRepoImpl{Db.Collection(messageCollectionName)}
 }
 
 func ConnectToMongo(ctx context.Context, uri string, dbName string) {
@@ -58,5 +59,5 @@ func ConnectToMongo(ctx context.Context, uri string, dbName string) {
 func DropDb() {
 	DistributionRepo.collection.Drop(context.TODO())
 	ClientRepo.collection.Drop(context.TODO())
-	messageCollection.Drop(context.TODO())
+	MessageRepo.collection.Drop(context.TODO())
 }

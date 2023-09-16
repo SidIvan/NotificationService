@@ -16,6 +16,7 @@ import (
 var MessageSender *MessageSenderImpl
 
 type MessageSenderImpl struct {
+	MessageRepo repo.MessageRepoInterface
 }
 
 type MessageSenderInterface interface {
@@ -46,14 +47,14 @@ func (s MessageSenderImpl) sendAndSaveStatistics(d *dto.DistributionWithId, c *d
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		log.Println(err)
-		repo.CreateFailedMessage(&message)
+		s.MessageRepo.CreateFailedMessage(&message)
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("fbqr send request ended with code %d\n", resp.StatusCode)
-		repo.CreateFailedMessage(&message)
+		s.MessageRepo.CreateFailedMessage(&message)
 	}
-	repo.CreateSuccessMessage(&message)
+	s.MessageRepo.CreateSuccessMessage(&message)
 }
 
 func (s MessageSenderImpl) SendDistribution(d *dto.DistributionWithId) {
@@ -62,7 +63,7 @@ func (s MessageSenderImpl) SendDistribution(d *dto.DistributionWithId) {
 		return
 	}
 	for _, client := range *clients {
-		st := repo.GetStatus(d.Id, client.Id)
+		st := s.MessageRepo.GetStatus(d.Id, client.Id)
 		if st == dto.OkStatus {
 			return
 		}

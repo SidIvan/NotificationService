@@ -10,20 +10,28 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var messageCollection *mongo.Collection
+type MessageRepoImpl struct {
+	collection *mongo.Collection
+}
 
-func CreateSuccessMessage(message *dto.Message) string {
+type MessageRepoInterface interface {
+	CreateSuccessMessage(*dto.Message) string
+	CreateFailedMessage(*dto.Message) string
+	GetStatus(primitive.ObjectID, primitive.ObjectID) dto.MessageStatus
+}
+
+func (r MessageRepoImpl) CreateSuccessMessage(message *dto.Message) string {
 	message.Status = dto.OkStatus
-	return createMessage(message)
+	return r.createMessage(message)
 }
 
-func CreateFailedMessage(message *dto.Message) string {
+func (r MessageRepoImpl) CreateFailedMessage(message *dto.Message) string {
 	message.Status = dto.NotOkStatus
-	return createMessage(message)
+	return r.createMessage(message)
 }
 
-func createMessage(message *dto.Message) string {
-	res, err := messageCollection.InsertOne(context.TODO(), message)
+func (r MessageRepoImpl) createMessage(message *dto.Message) string {
+	res, err := r.collection.InsertOne(context.TODO(), message)
 	if err != nil {
 		log.Println(err)
 		return ""
@@ -31,8 +39,8 @@ func createMessage(message *dto.Message) string {
 	return res.InsertedID.(primitive.ObjectID).Hex()
 }
 
-func GetStatus(dId primitive.ObjectID, cId primitive.ObjectID) dto.MessageStatus {
-	cur, err := messageCollection.Find(context.TODO(), bson.D{
+func (r MessageRepoImpl) GetStatus(dId primitive.ObjectID, cId primitive.ObjectID) dto.MessageStatus {
+	cur, err := r.collection.Find(context.TODO(), bson.D{
 		{Key: "distributionId", Value: dId.Hex()},
 		{Key: "clientId", Value: cId.Hex()},
 	})

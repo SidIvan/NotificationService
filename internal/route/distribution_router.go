@@ -23,7 +23,7 @@ var (
 )
 
 func NewDistributionRouter(r *mux.Router) {
-	MessageSender := &MessageSenderImpl{}
+	MessageSender := &MessageSenderImpl{repo.MessageRepo}
 	DistributionService := RouteDistributionService{repo.DistributionRepo, MessageSender}
 	r = r.PathPrefix("/distribution").Subrouter()
 	r.
