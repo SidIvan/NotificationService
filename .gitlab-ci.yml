@@ -8,6 +8,8 @@ stages:
 
 dock:
   stage: dock
+  services:
+    - docker:20.10.8-dind
   script:
     - dockerd
     - docker-compose up
