@@ -7,7 +7,7 @@ stages:
   - build
 
 dock:
-  stage: build
+  stage: dock
   services:
     - docker:20.10.8-dind
   script:
