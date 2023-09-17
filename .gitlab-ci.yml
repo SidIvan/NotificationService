@@ -10,7 +10,7 @@ dock:
   services:
     - docker:20.10.8-dind
   before_script:
-    - docker-compose up
+    - docker-compose up -d
 
   script:
     - go fmt $(go list ./... | grep -v /vendor/)
