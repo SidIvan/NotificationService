@@ -9,6 +9,7 @@ stages:
 dock:
   stage: dock
   script:
+    - docker run hello-world
     - docker-compose up
 
 format:
