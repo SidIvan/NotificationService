@@ -19,6 +19,7 @@ compile:
   stage: build
   image: golang:latest
   script:
+    - cd NotificationService
     - mkdir -p mybinaries
     - go build -o mybinaries ./...
   artifacts:
