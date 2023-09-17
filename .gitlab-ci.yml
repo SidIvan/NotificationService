@@ -2,12 +2,11 @@ image:
   name: docker/compose:latest
 
 stages:
-  - dock
   - test
   - build
 
 dock:
-  stage: dock
+  stage: test
   services:
     - docker:20.10.8-dind
   script:
