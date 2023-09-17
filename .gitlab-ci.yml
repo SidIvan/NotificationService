@@ -9,7 +9,7 @@ stages:
 dock:
   stage: dock
   script:
-    - docker compose up
+    - docker-compose up
 
 format:
   stage: test
