@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h3>Get distiributions</h3>
+    <button id="get-all-distributions-button">Send Request</button>
+    <button id="clear-get-all-distributions-button">Clear</button>
+    <div id="get-all-distributions-response"></div>
+
+    <h3>Get distiribution</h3>
+    <div>
+        <form id="get-distribution-form">
+            <label for="get-distribution-id-input">Id:</label>
+            <input type="text" id="get-distribution-id-input" name="id" />
+            <p/>
+            <button type="submit">Send Request</button>
+            <button id="clear-get-distribution-button" type="reset">Clear</button>
+        </form>
+        <div id="get-distribution-response"></div>
+    </div>
+
+    <h3>Create distiribution</h3>
+    <div>
+        <form id="create-distribution-form">
+            <label for="create-distribution-input">Distribution JSON body:</label>
+            <input type="text" id="create-distribution-input" name="body" />
+            <p/>
+            <button type="submit">Send Request</button>
+            <button id="clear-create-distribution-button" type="reset">Clear</button>
+        </form>
+        <div id="create-distribution-response"></div>
+    </div>
+
+    <h3>Modify distiribution</h3>
+    <div>
+        <form id="modify-distribution-form">
+            <label for="modify-distribution-id-input">Id:</label>
+            <input type="text" id="modify-distribution-id" name="id" />
+            <p/>
+            <label for="modify-distribution-id-input">Distribution JSON body:</label>
+            <input type="text" id="modify-distribution-input" name="body" />
+            <p/>
+            <button type="submit">Send Request</button>
+            <button id="clear-modify-distribution-button" type="reset">Clear</button>
+        </form>
+        <div id="modify-distribution-response"></div>
+    </div>
+
+    <h3>Delete distiribution</h3>
+    <div>
+        <form id="delete-distribution-form">
+            <label for="delete-distribution-id-input">Id:</label>
+            <input type="text" id="delete-distribution-id" name="id" />
+            <p/>
+            <button type="submit">Send Request</button>
+            <button id="clear-delete-distribution-button" type="reset">Clear</button>
+        </form>
+        <div id="delete-distribution-response"></div>
+    </div>
+
+    <h3>Handle distiributions</h3>
+    <button id="handle-distributions-button">Send Request</button>
+
+
+    <script>
+        $(document).ready(function() {
+            $("#get-all-distributions-button").on("click", function() {
+                $.ajax({
+                    url: "http://localhost:8181/distribution/full-info",
+                    method: "GET",
+                    success: function(response) {
+                        $("#get-all-distributions-response").text(JSON.stringify(response));
+                    },
+                    error: function() {
+                        $("#dget-all-distributions-response").text("Error occurred while making the request.");
+                    }
+                });
+            });
+            $("#clear-get-all-distributions-button").on("click", function() {
+                $("#get-all-distributions-response").text("");
+            });
+
+
+
+            $("#get-distribution-form").on("submit", function(event) {
+                event.preventDefault();
+                var queryIdParam = $("#get-distribution-id-input").val();
+                $.ajax({
+                    url: "http://localhost:8181/distribution/info/" + queryIdParam, 
+                    method: "GET",
+                    success: function(response) {
+                        $("#get-distribution-response").text(JSON.stringify(response));
+                    },
+                    error: function() {
+                        $("#get-distribution-response").text("Error occurred while making the request.");
+                    }
+                });
+            });
+            $("#clear-get-distribution-button").on("click", function() {
+                $("#get-distribution-response").text("");
+            });
+            
+
+
+            $("#create-distribution-form").on("submit", function(event) {
+                event.preventDefault();
+                var bodyParam = $("#create-distribution-input").val();
+                $.ajax({
+                    url: "http://localhost:8181/distribution/create", 
+                    method: "POST",
+                    headers: {
+                        "Content-type":"application/json"
+                    },
+                    data: bodyParam,
+                    success: function(response) {
+                        $("#create-distribution-response").text(JSON.stringify(response));
+                    },
+                    error: function() {
+                        $("#create-distribution-response").text("Error occurred while making the request.");
+                    }
+                });
+            });
+            $("#clear-create-distribution-button").on("click", function() {
+                $("#create-distribution-response").text("");
+            });
+
+
+
+            $("#modify-distribution-form").on("submit", function(event) {
+                event.preventDefault();
+                var id = $("#modify-distribution-id").val();
+                var bodyParam = $("#modify-distribution-input").val();
+                $.ajax({
+                    url: "http://localhost:8181/distribution/modify/" + id, 
+                    method: "PUT",
+                    headers: {
+                        "Content-type":"application/json"
+                    },
+                    data: bodyParam,
+                    success: function(response) {
+                        $("#modify-distribution-response").text(JSON.stringify(response));
+                    },
+                    error: function() {
+                        $("#modify-distribution-response").text("Error occurred while making the request.");
+                    }
+                });
+            });
+            $("#clear-modify-distribution-button").on("click", function() {
+                $("#modify-distribution-response").text("");
+            });
+
+
+            $("#delete-distribution-form").on("submit", function(event) {
+                event.preventDefault();
+                var id = $("#delete-distribution-id").val();
+                $.ajax({
+                    url: "http://localhost:8181/distribution/delete/" + id, 
+                    method: "DELETE",
+                    success: function(response) {
+                        $("#delete-distribution-response").text(JSON.stringify(response));
+                    },
+                    error: function() {
+                        $("#delete-distribution-response").text("Error occurred while making the request.");
+                    }
+                });
+            });
+            $("#clear-delete-distribution-button").on("click", function() {
+                $("#delete-distribution-response").text("");
+            });
+
+
+
+            $("#handle-distributions-button").on("click", function() {
+                $.ajax({
+                    url: "http://localhost:8181/distribution/handle",
+                    method: "PATCH"
+                });
+            });
+        });
+    </script>
+</body>
+</html>

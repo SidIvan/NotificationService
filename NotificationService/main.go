@@ -34,6 +34,10 @@ func main() {
 	route.NewClientRouter(router)
 	route.NewDistributionRouter(router)
 	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler).Methods(http.MethodGet)
+	adminRouter := router.PathPrefix("/admin").Subrouter()
+	adminRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "admin/index.html")
+	}).Methods(http.MethodGet)
 	http.Handle("/", router)
 	go route.HandleLoop()
 	err := http.ListenAndServe(":8181", nil)
