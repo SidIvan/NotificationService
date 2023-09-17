@@ -3,17 +3,15 @@ image:
 
 stages:
   - test
-  - build
-
+  - build  
+  
 dock:
   stage: test
   services:
     - docker:20.10.8-dind
-  script:
+  before_script:
     - docker-compose up
 
-format:
-  stage: test
   script:
     - go fmt $(go list ./... | grep -v /vendor/)
     - go vet $(go list ./... | grep -v /vendor/)
