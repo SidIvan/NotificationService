@@ -14,7 +14,7 @@ import (
 
 var (
 	authToken           string
-	DistributionService RouteDistributionService
+	DistributionService *RouteDistributionService
 )
 
 var (
@@ -23,8 +23,8 @@ var (
 )
 
 func NewDistributionRouter(r *mux.Router) {
-	MessageSender := &MessageSenderImpl{repo.MessageRepo}
-	DistributionService := RouteDistributionService{repo.DistributionRepo, MessageSender}
+	MessageSender = &MessageSenderImpl{repo.MessageRepo}
+	DistributionService = &RouteDistributionService{repo.DistributionRepo, MessageSender}
 	r = r.PathPrefix("/distribution").Subrouter()
 	r.
 		HandleFunc("/create", DistributionService.createDistributionHandler).
@@ -54,6 +54,14 @@ type RouteDistributionService struct {
 	MessageSender    MessageSenderInterface
 }
 
+// @Tags			distribution
+// @Description	Create distribution
+// @Router			/distribution/create [post]
+// @ID				create-distribution
+// @Accept			json
+// @Param			input	body		dto.Distribution	true	"distribution info"
+// @Success		200		{string}	string				"error message if failure"
+// @failure		500
 func (s *RouteDistributionService) createDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	var distribution dto.Distribution
 	if !parseBody(w, r, &distribution) {
@@ -71,6 +79,12 @@ func (s *RouteDistributionService) createDistributionHandler(w http.ResponseWrit
 	w.Write([]byte(id))
 }
 
+// @Tags			distribution
+// @Description	Get info about all distributions
+// @Router			/distribution/full-info [get]
+// @ID				get-all-distributions
+// @Success		200	{array}	dto.DistributionWithId
+// @failure		502
 func (s *RouteDistributionService) fullInfoDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	distributions := s.DistributionRepo.FindAllDistributions()
 	if distributions == nil {
@@ -98,6 +112,13 @@ func (s *RouteDistributionService) fullInfoDistributionHandler(w http.ResponseWr
 	w.WriteHeader(http.StatusOK)
 }
 
+// @Tags			distribution
+// @Description	Get info about distribution
+// @Router			/distribution/info/{id} [get]
+// @ID				get-single-distribution
+// @Param			id	path		int	true	"distribution id"
+// @Success		200	{object}	dto.DistributionWithId
+// @failure		502
 func (s *RouteDistributionService) singleInfoDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	distribution := s.DistributionRepo.FindDistributionById(id)
@@ -127,6 +148,14 @@ func (s *RouteDistributionService) singleInfoDistributionHandler(w http.Response
 	w.WriteHeader(http.StatusOK)
 }
 
+// @Tags			distribution
+// @Description	Modify distribution
+// @Router			/distribution/modify/{id} [put]
+// @ID				modify-distribution
+// @Param			id		path	string				true	"distribution id"
+// @Param			input	body	dto.Distribution	true	"distribution info"
+// @Success		200
+// @failure		502
 func (s *RouteDistributionService) modifyDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	w.WriteHeader(http.StatusOK)
@@ -141,12 +170,23 @@ func (s *RouteDistributionService) modifyDistributionHandler(w http.ResponseWrit
 	s.DistributionRepo.UpdateDistribution(id, &distribution)
 }
 
+// @Tags			distribution
+// @Description	Delete distribution
+// @Router			/distribution/delete/{id} [delete]
+// @ID				delete-distribution
+// @Param			id	path	string	true	"distribution id"
+// @Success		200
 func (s *RouteDistributionService) deleteDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	s.DistributionRepo.DeleteDistribution(id)
 	w.WriteHeader(http.StatusOK)
 }
 
+// @Tags			distribution
+// @Description	handle distribution
+// @Router			/distribution/handle [patch]
+// @ID				handle-distributions
+// @Success		200
 func (s *RouteDistributionService) handleDistributionHandler(w http.ResponseWriter, r *http.Request) {
 	s.MessageSender.HandleDistributions()
 	w.WriteHeader(http.StatusOK)

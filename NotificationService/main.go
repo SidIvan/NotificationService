@@ -8,8 +8,18 @@ import (
 	"fmt"
 	"net/http"
 
+	_ "NotificationService/docs"
+
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+//	@Title			Notification service by Ivan Sidorenko
+//	@Version		1.0
+//	@description	Server's API
+
+//	@host		localhost:8181
+//	@BasePath	/
 
 func main() {
 	utils.InitGenerator()
@@ -23,6 +33,7 @@ func main() {
 	router := mux.NewRouter()
 	route.NewClientRouter(router)
 	route.NewDistributionRouter(router)
+	router.PathPrefix("/docs").Handler(httpSwagger.WrapHandler).Methods(http.MethodGet)
 	http.Handle("/", router)
 	go route.HandleLoop()
 	err := http.ListenAndServe(":8181", nil)

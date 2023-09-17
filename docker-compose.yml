@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+    - mongo-data:/data/db
+
+  main_service:
+    build: NotificationService/
+    command: go run main.go
+    ports: 
+      - '8181:8181'
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo-data: {}

@@ -36,6 +36,15 @@ type RouteClientService struct {
 	ClientRepo repo.ClientRepoInterface
 }
 
+//	@Tags			client
+//	@Description	Modify client info
+//	@Router			/client/modify/{id} [put]
+//	@ID				modify-client
+//	@Accept			json
+//	@Param			input	body		dto.Client	true	"client info"
+//	@Param			id		path		string		true	"client id"
+//	@Success		200		{string}	string		"error message if failure"
+//	@failure		500
 func (s *RouteClientService) modifyClientHandler(w http.ResponseWriter, r *http.Request) {
 	var client dto.Client
 	if !parseBody(w, r, &client) {
@@ -54,6 +63,12 @@ func (s *RouteClientService) modifyClientHandler(w http.ResponseWriter, r *http.
 	s.ClientRepo.UpdateClient(id, &client)
 }
 
+//	@Tags			client
+//	@Description	Create new client
+//	@Router			/client/create [post]
+//	@ID				create-client
+//	@Param			input	body		dto.Client	true	"client info"
+//	@Success		200		{string}	string		"error message if failure"
 func (s *RouteClientService) createClientHandler(w http.ResponseWriter, r *http.Request) {
 	var newClient dto.Client
 	if !parseBody(w, r, &newClient) {
@@ -71,6 +86,12 @@ func (s *RouteClientService) createClientHandler(w http.ResponseWriter, r *http.
 	w.Write([]byte(s.ClientRepo.CreateClient(&newClient)))
 }
 
+//	@Tags			client
+//	@Description	Delete client
+//	@Router			/client/delete/{phoneNumber} [delete]
+//	@ID				delete-client
+//	@Param			id	path	int	true	"phoneNumber"
+//	@Success		200
 func (s *RouteClientService) deleteClientHandler(w http.ResponseWriter, r *http.Request) {
 	phoneNumber := mux.Vars(r)["phoneNumber"]
 	s.ClientRepo.DeleteClient(phoneNumber)

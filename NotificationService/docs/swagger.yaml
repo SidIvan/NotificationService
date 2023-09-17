@@ -1,0 +1,215 @@
+basePath: /
+definitions:
+  dto.Client:
+    properties:
+      opCode:
+        type: string
+      phoneNumber:
+        type: string
+      tag:
+        type: string
+      utc:
+        type: string
+    type: object
+  dto.Distribution:
+    properties:
+      endAt:
+        type: string
+      filter:
+        $ref: '#/definitions/dto.Filter'
+      message:
+        type: string
+      startAt:
+        type: string
+    type: object
+  dto.DistributionWithId:
+    properties:
+      endAt:
+        type: string
+      filter:
+        $ref: '#/definitions/dto.Filter'
+      id:
+        type: string
+      message:
+        type: string
+      startAt:
+        type: string
+    type: object
+  dto.Filter:
+    properties:
+      opCode:
+        type: string
+      tag:
+        type: string
+    type: object
+host: localhost:8181
+info:
+  contact: {}
+  description: Server's API
+  title: Notification service by Ivan Sidorenko
+  version: "1.0"
+paths:
+  /client/create:
+    post:
+      description: Create new client
+      operationId: create-client
+      parameters:
+      - description: client info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Client'
+      responses:
+        "200":
+          description: error message if failure
+          schema:
+            type: string
+      tags:
+      - client
+  /client/delete/{phoneNumber}:
+    delete:
+      description: Delete client
+      operationId: delete-client
+      parameters:
+      - description: phoneNumber
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+      tags:
+      - client
+  /client/modify/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Modify client info
+      operationId: modify-client
+      parameters:
+      - description: client info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Client'
+      - description: client id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: error message if failure
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+      tags:
+      - client
+  /distribution/create:
+    post:
+      consumes:
+      - application/json
+      description: Create distribution
+      operationId: create-distribution
+      parameters:
+      - description: distribution info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Distribution'
+      responses:
+        "200":
+          description: error message if failure
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+      tags:
+      - distribution
+  /distribution/delete/{id}:
+    delete:
+      description: Delete distribution
+      operationId: delete-distribution
+      parameters:
+      - description: distribution id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      tags:
+      - distribution
+  /distribution/full-info:
+    get:
+      description: Get info about all distributions
+      operationId: get-all-distributions
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.DistributionWithId'
+            type: array
+        "502":
+          description: Bad Gateway
+      tags:
+      - distribution
+  /distribution/handle:
+    patch:
+      description: handle distribution
+      operationId: handle-distributions
+      responses:
+        "200":
+          description: OK
+      tags:
+      - distribution
+  /distribution/info/{id}:
+    get:
+      description: Get info about distribution
+      operationId: get-single-distribution
+      parameters:
+      - description: distribution id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DistributionWithId'
+        "502":
+          description: Bad Gateway
+      tags:
+      - distribution
+  /distribution/modify/{id}:
+    put:
+      description: Modify distribution
+      operationId: modify-distribution
+      parameters:
+      - description: distribution id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: distribution info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Distribution'
+      responses:
+        "200":
+          description: OK
+        "502":
+          description: Bad Gateway
+      tags:
+      - distribution
+swagger: "2.0"

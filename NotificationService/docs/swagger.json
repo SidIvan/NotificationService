@@ -1,0 +1,330 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Server's API",
+        "title": "Notification service by Ivan Sidorenko",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8181",
+    "basePath": "/",
+    "paths": {
+        "/client/create": {
+            "post": {
+                "description": "Create new client",
+                "tags": [
+                    "client"
+                ],
+                "operationId": "create-client",
+                "parameters": [
+                    {
+                        "description": "client info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Client"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "error message if failure",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/delete/{phoneNumber}": {
+            "delete": {
+                "description": "Delete client",
+                "tags": [
+                    "client"
+                ],
+                "operationId": "delete-client",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "phoneNumber",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/client/modify/{id}": {
+            "put": {
+                "description": "Modify client info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "client"
+                ],
+                "operationId": "modify-client",
+                "parameters": [
+                    {
+                        "description": "client info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Client"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "client id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "error message if failure",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/distribution/create": {
+            "post": {
+                "description": "Create distribution",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "distribution"
+                ],
+                "operationId": "create-distribution",
+                "parameters": [
+                    {
+                        "description": "distribution info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Distribution"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "error message if failure",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/distribution/delete/{id}": {
+            "delete": {
+                "description": "Delete distribution",
+                "tags": [
+                    "distribution"
+                ],
+                "operationId": "delete-distribution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "distribution id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/distribution/full-info": {
+            "get": {
+                "description": "Get info about all distributions",
+                "tags": [
+                    "distribution"
+                ],
+                "operationId": "get-all-distributions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.DistributionWithId"
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway"
+                    }
+                }
+            }
+        },
+        "/distribution/handle": {
+            "patch": {
+                "description": "handle distribution",
+                "tags": [
+                    "distribution"
+                ],
+                "operationId": "handle-distributions",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/distribution/info/{id}": {
+            "get": {
+                "description": "Get info about distribution",
+                "tags": [
+                    "distribution"
+                ],
+                "operationId": "get-single-distribution",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "distribution id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DistributionWithId"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway"
+                    }
+                }
+            }
+        },
+        "/distribution/modify/{id}": {
+            "put": {
+                "description": "Modify distribution",
+                "tags": [
+                    "distribution"
+                ],
+                "operationId": "modify-distribution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "distribution id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "distribution info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Distribution"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "502": {
+                        "description": "Bad Gateway"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.Client": {
+            "type": "object",
+            "properties": {
+                "opCode": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "utc": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Distribution": {
+            "type": "object",
+            "properties": {
+                "endAt": {
+                    "type": "string"
+                },
+                "filter": {
+                    "$ref": "#/definitions/dto.Filter"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "startAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DistributionWithId": {
+            "type": "object",
+            "properties": {
+                "endAt": {
+                    "type": "string"
+                },
+                "filter": {
+                    "$ref": "#/definitions/dto.Filter"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "startAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Filter": {
+            "type": "object",
+            "properties": {
+                "opCode": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
