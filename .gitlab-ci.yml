@@ -17,6 +17,7 @@ test:
 
 compile:
   stage: build
+  image: golang:latest
   script:
     - mkdir -p mybinaries
     - go build -o mybinaries ./...
