@@ -1,18 +1,14 @@
-image:
-  name: docker/compose:latest
+services:
+  - mongo:latest
 
 stages:
   - test
-  - build  
-  
-dock:
-  stage: test
-  services:
-    - docker:20.10.8-dind
-  before_script:
-    - docker-compose up -d
-    - docker-compose run
+  - build
 
+test:
+  stage: test
+  image: golang:latest
+ 
   script:
     - go fmt $(go list ./... | grep -v /vendor/)
     - go vet $(go list ./... | grep -v /vendor/)
